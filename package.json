@@ -1,0 +1,28 @@
+{
+  "name": "prestashop-eu-vat",
+  "version": "1.0.0",
+  "description": "Process VAT for EU PrestaShop configuration",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:cnstechnicalgroup/prestashop-eu-vat.git"
+  },
+  "keywords": [
+    "prestashop",
+    "vat",
+    "taxes"
+  ],
+  "author": "Sam Morrison",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/cnstechnicalgroup/prestashop-eu-vat/issues"
+  },
+  "homepage": "https://github.com/cnstechnicalgroup/prestashop-eu-vat",
+  "dependencies": {
+    "bluebird": "^2.9.6",
+    "mysql": "^2.5.4"
+  }
+}

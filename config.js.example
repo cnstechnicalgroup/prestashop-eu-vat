@@ -1,0 +1,11 @@
+'use strict';
+
+var db_config = {
+    host: 'localhost',
+    user: 'prestashop',
+    password: 'password',
+    database: 'prestashop',
+    multipleStatements: true
+}
+
+module.exports.db_config = db_config;
