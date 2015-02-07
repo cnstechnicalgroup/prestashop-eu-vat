@@ -26,7 +26,7 @@ npm install
 Configuration
 ------------
 
-Copy config.js.example to config.js and modify it to match your DB settings:
+Copy _config.js to config.js and modify it to match your DB settings:
 ```javascript
 var config = {
     db_config: {
