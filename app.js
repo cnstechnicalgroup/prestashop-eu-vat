@@ -60,7 +60,7 @@ var createSpecificPriceInserts = function(product, countries) {
 
 // The ps_specific_price table doesn't have a unique
 // key on the multi-key index which includes id_product
-// and id_country. This INSERT INTO handles the upsert.
+// and id_country. This INSERT INTO prohibits duplicates.
 var insertSpecificPrice = function(row) {
     var insertSQL = "INSERT INTO ps_specific_price " +
         " (id_specific_price_rule, " +
