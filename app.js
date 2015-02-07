@@ -2,21 +2,26 @@
 
 var Promise = require('bluebird');
 var mysql = Promise.promisifyAll(require('mysql'));
-var config = require('./config');
+var config = require('./config').config;
 var connection = mysql.createConnection(config.db_config);
+var tax_rules_group = config.tax_rules_group;
 var countries = [];
 var specificPriceInserts = [];
+
+//
+// All SQL here
+//
 
 // SQL: Return all products to get id_product and id_tax_rules_group
 var productSQL = 'SELECT id_product, price FROM prestashop.ps_product WHERE id_product IN (3, 4, 5); ';
 
 // SQL: Get all EU country IDs
-var euCountryIDsSQL = "SELECT tr.id_country, t.rate FROM ps_tax_rule AS tr JOIN ps_tax AS t ON t.id_tax = tr.id_tax WHERE tr.id_tax_rules_group = 7 AND tr.id_tax = 5; "
+var euCountryIDsSQL = "SELECT tr.id_country, t.rate FROM ps_tax_rule AS tr JOIN ps_tax AS t ON t.id_tax = tr.id_tax WHERE tr.id_tax_rules_group = "+tax_rules_group+" AND tr.id_tax = 5; "
 
 // SQL: Set all product id_tax_rules_group to 7
-var idTaxRulesGroupSQL = "UPDATE ps_product SET id_tax_rules_group = 7 WHERE id_product IN (3, 4, 5); UPDATE ps_product_shop SET id_tax_rules_group = 7 WHERE id_product IN (3, 4, 5);";
+var idTaxRulesGroupSQL = "UPDATE ps_product SET id_tax_rules_group = "+tax_rules_group+" WHERE id_product IN (3, 4, 5); UPDATE ps_product_shop SET id_tax_rules_group = "+tax_rules_group+" WHERE id_product IN (3, 4, 5);";
 
-// Run idTaxRulesGroupSQL
+// Set all product id_tax_rules_group to config.tax_rules_group value
 connection.query(idTaxRulesGroupSQL, function(err, result) {
     if (err) {
         connection.rollback(function() {
@@ -25,6 +30,7 @@ connection.query(idTaxRulesGroupSQL, function(err, result) {
     }
 });
 
+// Create a json object for each new insert
 var createSpecificPriceInserts = function(product, countries) {
     countries.forEach(function(country) {
         var specificPrice = {
@@ -52,12 +58,9 @@ var createSpecificPriceInserts = function(product, countries) {
     });
 }
 
-/**
- * The ps_specific_price table doesn't have a unique
- * key on the multi-key index which includes id_product
- * and id_country. This INSERT INTO handles the upsert.
- **/
-
+// The ps_specific_price table doesn't have a unique
+// key on the multi-key index which includes id_product
+// and id_country. This INSERT INTO handles the upsert.
 var insertSpecificPrice = function(row) {
     var insertSQL = "INSERT INTO ps_specific_price " +
         " (id_specific_price_rule, " +
@@ -110,7 +113,13 @@ var insertSpecificPrice = function(row) {
 // Run these two queries during the same connection
 var concatSQL = productSQL + euCountryIDsSQL;
 
-// Start by getting all of the products that need to we updated
+//
+// Loop through every product in ps_product and create a specific
+// price entry if none exists. Also create an 'All Countries' 
+// entry with the flat price that includes the EU VAT rate.
+//
+
+//Start by getting all of the products that need to we updated
 Promise.promisify(connection.query, connection)(concatSQL).then(function(results) {
     // Assign returned id_country and rate to countries
     var products = results[0][0];

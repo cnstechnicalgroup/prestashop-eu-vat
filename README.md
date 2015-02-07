@@ -28,12 +28,16 @@ Configuration
 
 Copy config.js.example to config.js and modify it to match your DB settings:
 ```javascript
-var db_config = {
-    host: 'localhost',
-    user: 'prestashop',
-    password: 'password',
-    database: 'prestashop',
-    multipleStatements: true
+var config = {
+    db_config: {
+        host: 'localhost',
+        user: 'prestashop',
+        password: 'password',
+        database: 'prestashop',
+        multipleStatements: true
+    },
+    // This is found in Localization > Tax Rules (ID)
+    tax_rules_group: 5
 }
 ```
 
