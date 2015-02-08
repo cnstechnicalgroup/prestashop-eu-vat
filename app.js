@@ -159,7 +159,7 @@ Promise.promisify(connection.query, connection)(concatSQL).then(function(results
         // First, try and update an existing special price entry
         updateSpecificPrice(row).then(function(results) {
             if (results.affectedRows == 0) {
-                // Special price is new, noy updated,
+                // Special price is new, not updated,
                 // insert new specific price.
                 insertSpecificPrice(row);
             }
