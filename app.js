@@ -16,10 +16,10 @@ var specificPriceInserts = [];
 var productSQL = 'SELECT id_product, price FROM prestashop.ps_product WHERE id_product IN (3, 4, 5); ';
 
 // SQL: Get all EU country IDs
-var euCountryIDsSQL = "SELECT tr.id_country, t.rate FROM ps_tax_rule AS tr JOIN ps_tax AS t ON t.id_tax = tr.id_tax WHERE tr.id_tax_rules_group = "+tax_rules_group+" AND tr.id_tax = 5; "
+var euCountryIDsSQL = "SELECT tr.id_country, t.rate FROM ps_tax_rule AS tr JOIN ps_tax AS t ON t.id_tax = tr.id_tax WHERE tr.id_tax_rules_group = " + tax_rules_group + " AND tr.id_tax = 5; "
 
 // SQL: Set all product id_tax_rules_group to 7
-var idTaxRulesGroupSQL = "UPDATE ps_product SET id_tax_rules_group = "+tax_rules_group+" WHERE id_product IN (3, 4, 5); UPDATE ps_product_shop SET id_tax_rules_group = "+tax_rules_group+" WHERE id_product IN (3, 4, 5);";
+var idTaxRulesGroupSQL = "UPDATE ps_product SET id_tax_rules_group = " + tax_rules_group + " WHERE id_product IN (3, 4, 5); UPDATE ps_product_shop SET id_tax_rules_group = " + tax_rules_group + " WHERE id_product IN (3, 4, 5);";
 
 // Set all product id_tax_rules_group to config.tax_rules_group value
 connection.query(idTaxRulesGroupSQL, function(err, result) {
@@ -58,55 +58,72 @@ var createSpecificPriceInserts = function(product, countries) {
     });
 }
 
+// Update the specific price with the new flat rate
+var updateSpecificPrice = function(row) {
+    return new Promise(function(resolve) {
+        connection.query("UPDATE ps_specific_price SET price = " + row.price + " WHERE id_product = " + row.id_product + " AND id_country = " + row.id_country, function(err, results) {
+            if (err) {
+                connection.rollback(function() {
+                    throw err;
+                });
+            }
+            resolve(results);
+        });
+    });
+};
+
 // The ps_specific_price table doesn't have a unique
 // key on the multi-key index which includes id_product
 // and id_country. This INSERT INTO prohibits duplicates.
 var insertSpecificPrice = function(row) {
-    var insertSQL = "INSERT INTO ps_specific_price " +
-        " (id_specific_price_rule, " +
-        "  id_cart, " +
-        "  id_product, " +
-        "  id_shop, " +
-        "  id_shop_group, " +
-        "  id_currency, " +
-        "  id_country, " +
-        "  id_group, " +
-        "  id_customer, " +
-        "  id_product_attribute, " +
-        "  price, " +
-        "  from_quantity, " +
-        "  reduction, " +
-        "  reduction_tax, " +
-        "  reduction_type, " +
-        "  `from`, " +
-        "  `to`) " +
-        " SELECT " +
-        row.id_specific_price_rule + ", " +
-        row.id_cart + ", " +
-        row.id_product + ", " +
-        row.id_shop + ", " +
-        row.id_shop_group + ", " +
-        row.id_currency + ", " +
-        row.id_country + ", " +
-        row.id_group + ", " +
-        row.id_customer + ", " +
-        row.id_product_attribute + ", " +
-        row.price + ", " +
-        row.from_quantity + ", " +
-        row.reduction + ", " +
-        row.reduction_tax + ", " +
-        "'" + row.reduction_type + "', " +
-        "'" + row.from + "', " +
-        "'" + row.to + "'" +
-        " FROM ps_specific_price " +
-        " WHERE NOT EXISTS (SELECT * FROM ps_specific_price WHERE id_product = " + row.id_product + " AND id_country = " + row.id_country + ") LIMIT 1;";
+    return new Promise(function(resolve) {
+        var insertSQL = "INSERT INTO ps_specific_price " +
+            " (id_specific_price_rule, " +
+            "  id_cart, " +
+            "  id_product, " +
+            "  id_shop, " +
+            "  id_shop_group, " +
+            "  id_currency, " +
+            "  id_country, " +
+            "  id_group, " +
+            "  id_customer, " +
+            "  id_product_attribute, " +
+            "  price, " +
+            "  from_quantity, " +
+            "  reduction, " +
+            "  reduction_tax, " +
+            "  reduction_type, " +
+            "  `from`, " +
+            "  `to`) " +
+            " SELECT " +
+            row.id_specific_price_rule + ", " +
+            row.id_cart + ", " +
+            row.id_product + ", " +
+            row.id_shop + ", " +
+            row.id_shop_group + ", " +
+            row.id_currency + ", " +
+            row.id_country + ", " +
+            row.id_group + ", " +
+            row.id_customer + ", " +
+            row.id_product_attribute + ", " +
+            row.price + ", " +
+            row.from_quantity + ", " +
+            row.reduction + ", " +
+            row.reduction_tax + ", " +
+            "'" + row.reduction_type + "', " +
+            "'" + row.from + "', " +
+            "'" + row.to + "'" +
+            " FROM ps_specific_price " +
+            " WHERE NOT EXISTS (SELECT * FROM ps_specific_price WHERE id_product = " + row.id_product + " AND id_country = " + row.id_country + ") LIMIT 1;";
 
-    connection.query(insertSQL, function(err, result) {
-        if (err) {
-            connection.rollback(function() {
-                throw err;
-            });
-        }
+        connection.query(insertSQL, function(err, result) {
+            if (err) {
+                connection.rollback(function() {
+                    throw err;
+                });
+            }
+            resolve(result);
+        });
     });
 }
 
@@ -139,8 +156,14 @@ Promise.promisify(connection.query, connection)(concatSQL).then(function(results
     createSpecificPriceInserts(product, countries);
 }).then(function() {
     specificPriceInserts.forEach(function(row) {
-        // Finally, insert the specific prices.
-        insertSpecificPrice(row);
+        updateSpecificPrice(row).then(function(results) {
+            if (results.affectedRows == 0) {
+                // No update, insert new specific price.
+                insertSpecificPrice(row);
+            }
+        });
     });
-    connection.end()
+}).
+finally(function() {
+    connection.end();
 })
