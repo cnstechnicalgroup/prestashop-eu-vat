@@ -165,8 +165,7 @@ Promise.promisify(connection.query, connection)(concatSQL).then(function(results
             }
         });
     });
-}).
-finally(function() {
+}).finally(function() {
   // Close the connection to MySQL
   connection.end();
 })
