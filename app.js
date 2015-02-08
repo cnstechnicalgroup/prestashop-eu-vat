@@ -156,9 +156,11 @@ Promise.promisify(connection.query, connection)(concatSQL).then(function(results
     createSpecificPriceInserts(product, countries);
 }).then(function() {
     specificPriceInserts.forEach(function(row) {
+        // First, try and update an existing special price entry
         updateSpecificPrice(row).then(function(results) {
             if (results.affectedRows == 0) {
-                // No update, insert new specific price.
+                // Special price is new, noy updated,
+                // insert new specific price.
                 insertSpecificPrice(row);
             }
         });
