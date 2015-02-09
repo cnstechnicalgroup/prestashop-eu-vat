@@ -23,7 +23,7 @@ var eu_country_ids_sql = " SELECT tr.id_country, t.rate " +
 // Run those first two queries during the initial query 
 var product_and_country_sql = product_sql + eu_country_ids_sql;
 
-// SQL: Set all product id_tax_rules_group to 7
+// SQL: Set all product id_tax_rules_group to tax_rules_group value
 var id_tax_rules_group_sql = " UPDATE ps_product " +
                              " SET id_tax_rules_group = " + tax_rules_group + "; " +
                              " UPDATE ps_product_shop " +
