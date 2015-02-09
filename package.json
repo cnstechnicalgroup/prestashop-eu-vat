@@ -24,7 +24,6 @@
   "dependencies": {
     "bluebird": "^2.9.6",
     "mysql": "^2.5.4",
-    "mysql-promise2": "0.0.2",
-    "promise-mysql": "^1.0.0"
+    "mysql-promise2": "0.0.2"
   }
 }
