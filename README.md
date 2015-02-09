@@ -57,7 +57,7 @@ This script will create specific price entries for every country associated with
 For example, configure a Tax Rule with specific country entries as follows:
 
 | Country     |State | Zip/Postal code | Behavior      | Tax    | Description |
-|-----------------------------------------------------------------------------|
+|-------------|------|-----------------|---------------|--------|-------------|
 | France      |  --  |              -- | This tax only | 20.00% |             | 
 | Allemagne   |  --  |              -- | This tax only | 20.00% |             | 
 | Belgique    |  --  |              -- | This tax only | 20.00% |             | 
