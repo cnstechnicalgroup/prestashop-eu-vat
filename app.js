@@ -8,30 +8,37 @@ var pool = mysql.createPool(config.db_config);
 var tax_rules_group = config.tax_rules_group;
 var countries = [];
 
-//
-// All SQL here
-//
+// BEGIN SQL
 
 // SQL: Return all products to get id_product and id_tax_rules_group
 var product_sql = "SELECT id_product, price FROM prestashop.ps_product; ";
 
 // SQL: Get all EU country IDs
-var eu_country_ids_sql = "SELECT tr.id_country, t.rate FROM ps_tax_rule AS tr JOIN ps_tax AS t ON t.id_tax = tr.id_tax WHERE tr.id_tax_rules_group = " + tax_rules_group + " AND tr.id_tax = 5; "
+var eu_country_ids_sql = " SELECT tr.id_country, t.rate " +
+                         " FROM ps_tax_rule AS tr " +
+                         " JOIN ps_tax AS t ON t.id_tax = tr.id_tax " +
+                         " WHERE tr.id_tax_rules_group = " + tax_rules_group +
+                         " AND tr.id_tax = 5; "
 
 // Run those first two queries during the initial query 
 var product_and_country_sql = product_sql + eu_country_ids_sql;
 
 // SQL: Set all product id_tax_rules_group to 7
-var id_tax_rules_group_sql = "UPDATE ps_product SET id_tax_rules_group = " + tax_rules_group + "; UPDATE ps_product_shop SET id_tax_rules_group = " + tax_rules_group + ";";
+var id_tax_rules_group_sql = " UPDATE ps_product " +
+                             " SET id_tax_rules_group = " + tax_rules_group + "; " +
+                             " UPDATE ps_product_shop " +
+                             " SET id_tax_rules_group = " + tax_rules_group + ";";
 
 // SQL: Update existing specific price
-var update_specific_price_sql = "UPDATE ps_specific_price SET price = ? WHERE id_product = ? AND id_country = ?";
+var update_specific_price_sql = " UPDATE ps_specific_price SET price = ? " +
+                                " WHERE id_product = ? AND id_country = ?";
 
 // SQL: Insert new specific price
 var insert_specific_price_sql = "INSERT INTO ps_specific_price SET ? ";
 
-// Set all product id_tax_rules_group to config.tax_rules_group value
+// END SQL
 
+// Set all product id_tax_rules_group to config.tax_rules_group value
 using(pool.getTransaction(), function(connection) {
   connection.queryAsync(id_tax_rules_group_sql).catch(function(err) {
       connection.rollback(function() {
@@ -85,12 +92,9 @@ var stageSpecificPrices = function(products, countries) {
     return specific_price_rows;
 }
 
-//
 // Loop through every product in ps_product and create a specific
 // price entry if none exists. Also create an 'All Countries' 
 // entry with the flat price that includes the EU VAT rate.
-//
-
 using(pool.getTransaction(), function(connection) {
     // this callback is still pending
     return connection.queryAsync(product_and_country_sql).then(function(results) {
