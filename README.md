@@ -1,7 +1,7 @@
 prestashop-eu-vat
 ========
 
-This script adds specific price entries for app products every EU countries.
+This script adds specific price entries for every EU country as well as a single flat price (retail price + EU VAT rate) for every product.
 
 Requirements
 ------------
