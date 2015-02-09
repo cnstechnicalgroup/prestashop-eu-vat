@@ -64,7 +64,7 @@ For example, configure a Tax Rule with specific country entries as follows:
 | Belgique    |  --  |              -- | This tax only | 20.00% |             | 
 | ...         |  --  |              -- | This tax only | 20.00% |             | 
 
-Set tax_rules_group to the value of this tax rule before running.
+Set tax_rules_group to the value of this tax rule ID before running.
 
 The script will create specific price entries similar to the following for every product:
 
