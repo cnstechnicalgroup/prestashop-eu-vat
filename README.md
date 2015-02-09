@@ -62,6 +62,7 @@ For example, configure a Tax Rule with specific country entries as follows:
 | Allemagne   |  --  |              -- | This tax only | 20.00% |             | 
 | Belgique    |  --  |              -- | This tax only | 20.00% |             | 
 | Luxembourg  |  --  |              -- | This tax only | 20.00% |             | 
+| ...         |  --  |              -- | This tax only | 20.00% |             | 
 
 License
 -------
