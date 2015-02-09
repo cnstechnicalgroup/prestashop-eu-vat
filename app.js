@@ -105,7 +105,7 @@ using(pool.getTransaction(), function(connection) {
         // Return the products results
         return stageSpecificPrices(products, countries);
     }).each(function(row) {
-        // For each specific price, try to update it or insert as new
+        // For each specific price, try to update existing or insert new
         var update_values = [row.price, row.id_product, row.id_country];
         connection.queryAsync(update_specific_price_sql, update_values).then(function(results) {
             if (results[0].affectedRows === 0) {
