@@ -49,6 +49,20 @@ To run the script and generate specific price entries for all products, use the 
 node app.js
 ```
 
+PrestaShop setup
+----------------
+
+This script will create specific price entries for every country associated with the tax_rules_group ID specified in the config.js plus a specific price for id_country 0 (All countries) set to the product price + EU tax rate.
+
+For example, configure a Tax Rule with specific country entries as follows:
+
+| Country     |State | Zip/Postal code | Behavior      | Tax    | Description |
+|-----------------------------------------------------------------------------|
+| France      |  --  |              -- | This tax only | 20.00% |             | 
+| Allemagne   |  --  |              -- | This tax only | 20.00% |             | 
+| Belgique    |  --  |              -- | This tax only | 20.00% |             | 
+| Luxembourg  |  --  |              -- | This tax only | 20.00% |             | 
+
 License
 -------
 
