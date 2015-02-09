@@ -1,4 +1,4 @@
-'use strict'
+"use strict"
 
 var Promise = require("bluebird");
 var mysql = require('mysql-promise2');
@@ -18,7 +18,7 @@ var eu_country_ids_sql = " SELECT tr.id_country, t.rate " +
                          " FROM ps_tax_rule AS tr " +
                          " JOIN ps_tax AS t ON t.id_tax = tr.id_tax " +
                          " WHERE tr.id_tax_rules_group = " + tax_rules_group +
-                         " AND tr.id_tax = 5; "
+                         " AND tr.id_tax = 5; ";
 
 // Run those first two queries during the initial query 
 var product_and_country_sql = product_sql + eu_country_ids_sql;
@@ -60,7 +60,7 @@ var createSpecificPriceInsert = function(product, country) {
         id_group: 0,
         id_customer: 0,
         id_product_attribute: 0,
-        price: (country.id_country == 0 ? (product.price + (product.price * country.rate)).toFixed(2) : -1),
+        price: (country.id_country === 0 ? (product.price + (product.price * country.rate)).toFixed(2) : -1),
         from_quantity: 1,
         reduction: 0,
         reduction_tax: 1,
@@ -68,7 +68,7 @@ var createSpecificPriceInsert = function(product, country) {
         from: '0000-00-00 00:00:00',
         to: '0000-00-00 00:00:00'
     };
-}
+};
 
 // Create specific_price_rows object containing all possible
 // specific price entries / updates.
@@ -90,7 +90,8 @@ var stageSpecificPrices = function(products, countries) {
         });
     });
     return specific_price_rows;
-}
+};
+
 
 // Loop through every product in ps_product and create a specific
 // price entry if none exists. Also create an 'All Countries' 
