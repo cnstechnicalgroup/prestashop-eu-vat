@@ -84,5 +84,4 @@ GPLv2
 Author Information
 ------------------
 
-Created by Sam Morrison
-https://www.twitter.com/samcns
+Created by [Sam Morrison](https://www.twitter.com/samcns)
